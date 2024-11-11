@@ -15,3 +15,4 @@ veldata = HLAopti.convertVeldata(args.input, args.virus, args.immunocut)
 Path(args.outdir).mkdir(parents=True, exist_ok=True) # create output directory if not exists
 veldata.to_csv(args.outdir+'/scored_vaccine_elements.tsv', sep="\t", index=False) # write output list of ranked vaccine elements
 HLAopti.scoreBars(veldata, args.outdir+'/scored_barplot.pdf', args.virus) # write output plot of ranked elements
+HLAopti.score2D(veldata, args.outdir+'/scored_scatterplot.pdf', args.virus) # write output plot of ranked elements
