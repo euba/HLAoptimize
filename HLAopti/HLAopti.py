@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def convertVeldata(csvfile, virus, immunocut):
 	### cast inputs to respective data types
@@ -30,8 +32,17 @@ def convertVeldata(csvfile, virus, immunocut):
 
 	return(veldata)
 
-def some_func():
-    return 42
+def scoreBars(veldata, outplot, title):
+	veldata_cnts = veldata["HLA coverage"] # taking out the HLA coverage for downstream calculation
 
-def some_func2(input, output):
-    return ("Input: "+input+", Output: "+output)
+	### canvas parameters
+	fig, ax = plt.subplots(figsize=(18, len(veldata.index)/4)) # scaling the height of plot by number of vaccine elements
+	cols = ['grey' if (x < max(veldata_cnts)) else 'red' for x in veldata_cnts] # color the bars based on the top picks
+
+	### setting up the barplot
+	snsplot = sns.barplot(x="HLA coverage", y="Element", palette=cols, data=veldata, ax=ax) # main plot function
+	snsplot.set_title(title, size=50) # setting the plot title based on selected virus
+	snsplot.set_xlabel('HLA coverage', size=20) # setting size of x-axis label
+	snsplot.set_ylabel('Element', size=20) # setting size of y-axis label
+	snsplot.figure.savefig(outplot) # saving the plot
+
