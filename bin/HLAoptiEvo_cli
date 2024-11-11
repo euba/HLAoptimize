@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+#import sys
+import HLAopti
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("input", help="Specify input csv file with HLA values")
+parser.add_argument("output", help="Specify output directory")
+args = parser.parse_args()
+
+print('hello Eco')
+print(HLAopti.some_func2(args.input, args.output))

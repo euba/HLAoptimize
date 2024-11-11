@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import HLAopti
+import argparse
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("input", help="Specify input csv file with HLA data")
+parser.add_argument("virus", help="Specify the virus you are interested in")
+parser.add_argument("immunocut", help="Specify the cut-off value of Immunogenicity")
+parser.add_argument("outdir", help="Specify an output directory for results")
+args = parser.parse_args()
+
+veldata = HLAopti.convertVeldata(args.input, args.virus, args.immunocut)
+Path(args.outdir).mkdir(parents=True, exist_ok=True) # create output directory if not exists
+veldata.to_csv(args.outdir+'/scored_vaccine_elements.tsv', sep="\t", index=False) # write output list of ranked vaccine elements
