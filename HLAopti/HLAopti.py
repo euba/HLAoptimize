@@ -20,8 +20,8 @@ def convertVeldata(csvfile, virus, immunocut):
 	for vel in vels:
 		veldf = virusdf_cov[virusdf_cov['Vaccine Element'] == vel] # select the right element
 		row = [vel,
-			np.median(veldf["Immunogenicity Score"]), # calculate median of immunogenicity
-			np.median(veldf["Error Rate"]), # calculate median of error rate
+			round(np.median(veldf["Immunogenicity Score"]), 2), # calculate median of immunogenicity
+			round(np.median(veldf["Error Rate"]), 2), # calculate median of error rate
 			len(veldf.index)] # calcute number of covered HLAs
 		veldata.append(row)
 
