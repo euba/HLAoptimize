@@ -11,6 +11,8 @@ parser.add_argument("immunocut", help="Specify the cut-off value of Immunogenici
 parser.add_argument("outdir", help="Specify an output directory for results")
 args = parser.parse_args()
 
+assert float(args.immunocut) < 0.99, "Your cut-off value for Immunogenicity is too high"
+
 veldata = HLAopti.convertVeldata(args.input, args.virus, args.immunocut)
 Path(args.outdir).mkdir(parents=True, exist_ok=True) # create output directory if not exists
 veldata.to_csv(args.outdir+'/scored_vaccine_elements.tsv', sep="\t", index=False) # write output list of ranked vaccine elements

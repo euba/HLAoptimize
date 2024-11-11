@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-#import sys
 import HLAopti
-
 import argparse
+from pathlib import Path
+
 parser = argparse.ArgumentParser()
-parser.add_argument("input", help="Specify input csv file with HLA values")
-parser.add_argument("output", help="Specify output directory")
+parser.add_argument("input", help="Specify input csv file with HLA data")
+parser.add_argument("immunocut", help="Specify the cut-off value of Immunogenicity")
+parser.add_argument("outdir", help="Specify an output directory for results")
 args = parser.parse_args()
 
-print('hello Eco')
-print(HLAopti.some_func2(args.input, args.output))
+assert float(args.immunocut) < 0.99, "Your cut-off value for Immunogenicity is too high"
+
+print(HLAopti.compareHLAdata(args.input, args.immunocut))
