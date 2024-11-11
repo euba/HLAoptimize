@@ -97,5 +97,15 @@ def compareHLAdata(csvfile, immunocut):
 	veldata_scaled.index = veldata['Element'] # rename index by vaccine elements
 	return(veldata_scaled)
 
+def calcFitness(velscale, velgenome, velweight=[0.5,2,2,1,2]):
+	fitness_mat = velscale.loc[velgenome] # select a subset of the scaled vaccine element features based on minimal set
+	fitness_all = np.array(fitness_mat.mean(axis=0)) # calculate array of individual fitness functions
+	len_fitness = 1-len(velgenome)/len(velscale.index) # calculate inverse of vaccine element list, which can be maximized (e.g., minimized)
+	fitness_all = np.append(len_fitness, fitness_all) # add length fitness to array
+	fitness = np.sum(fitness_all * velweight)/np.sum(velweight) # calculated overall fitness as weighted average of individual fitness functions
+	return(fitness)
+
+
+
 
 
