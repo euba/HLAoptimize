@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -97,15 +98,30 @@ def compareHLAdata(csvfile, immunocut):
 	veldata_scaled.index = veldata['Element'] # rename index by vaccine elements
 	return(veldata_scaled)
 
-def calcFitness(velscale, velgenome, velweight=[0.5,2,2,1,2]):
-	fitness_mat = velscale.loc[velgenome] # select a subset of the scaled vaccine element features based on minimal set
+def calcFitness(velscale, velpheno, velweight=[0.5,2,2,1,2]):
+	fitness_mat = velscale.loc[velpheno] # select a subset of the scaled vaccine element features based on minimal set
 	fitness_all = np.array(fitness_mat.mean(axis=0)) # calculate array of individual fitness functions
-	len_fitness = 1-len(velgenome)/len(velscale.index) # calculate inverse of vaccine element list, which can be maximized (e.g., minimized)
+	len_fitness = 1-len(velpheno)/len(velscale.index) # calculate inverse of vaccine element list, which can be maximized (e.g., minimized)
 	fitness_all = np.append(len_fitness, fitness_all) # add length fitness to array
 	fitness = np.sum(fitness_all * velweight)/np.sum(velweight) # calculated overall fitness as weighted average of individual fitness functions
 	return(fitness)
 
+def geno2Pheno(velindex, velgenome): # helper function to convert array of presence/absence (0/1) to list of vaccine elements 
+	velpheno = list(np.take(velindex, np.where(velgenome == 1)[0]))
+	return(velpheno)
 
+def mutation(velgenome, mutrate): # helper function to mutate random positions in genome
+	for i in range(1,mutrate): # mutation rate is implemented as number of positions mutated
+		randind = random.randint(0, len(velgenome)-1) # select a random position
+		if velgenome[randind] == 1: # invert the boolean integer of the position
+			velgenome[randind] = 0
+		else:
+			velgenome[randind] = 1
+	return(velgenome)
 
+def crossOver(velgenome1, velgenome2): # helper function to cross over two genomes with each other
+	randind = random.randint(0, len(velgenome1)-1) # select random position to cross over in
+	velgenome_new = np.concatenate((velgenome1[:randind], velgenome2[randind:])) # cross over both genomes
+	return(velgenome_new)
 
 
