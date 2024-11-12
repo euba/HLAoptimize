@@ -85,9 +85,36 @@ It is recommended to investigate to output plots and the ranked .tsv table to ma
 
 To find optimal sets of vaccine elements that satisfy different objective functions, a genetic algorithm is used for optimization. The following objective functions need to be satisfied:
 
-- $iscore$: Maximize the sum of immogenicity score over all HLAs in a vaccine element over all viruses
-- $binding$: Maximize the sum of Binding over all HLAs in a vaccine element over all viruses
-- $1-error$: Minimize the overall error rate by maximizing the inverse
-- $HLAcover$: Maximize the HLA coverage over all vaccine elements over all viruses
-- $|vel_all| - |vel_sel|$: Minimize the set of selected vaccine elements as a maximization of the inverse size
+- $f_1(x)$: Maximize the sum of immogenicity score over all HLAs in a vaccine element over all viruses
+- $f_2(x)$: Maximize the sum of Binding over all HLAs in a vaccine element over all viruses
+- $f_3(x)$: Minimize the overall error rate by maximizing the inverse
+- $f_4(x)$: Maximize the HLA coverage over all vaccine elements over all viruses
+- $f_5(x)$: Minimize the set of selected vaccine elements as a maximization of the inverse size
 
+In principle, multi-objective optimization can be performed, but for simplicity all objectives are scalarized and combined into one weighted objective fitness function $f(x)$:
+
+```math
+f(x) = \frac{w_1 * f_1(x) + w_2 * f_2(x) + w_3 * f_3(x) + w_4 * f_4(x) + w_5 * f_5(x)}{\sum_{k=1}^5 w_k}
+```
+this objective function can then be maximized in each iteration of the genetic algorithm:
+
+#### Data transformation
+
+To make the values of the different objective functions comparable to each other, the data is scaled and transformed to lay within a range of 0 to 1 for each objective. This effectively means, that for each individual objective function (column of the transformed matrix) there is a vaccine element (rows of the transformed matrix) that has a value of 0 and vaccine element that has a value of 1. This makes the vaccine elements and also the objectives comparable to each other. In addition, this has the benefit, that the objective (fitness) function is as well scaled from 0 (theoretically worst solution) to 1 (theoretically best solution).
+
+The scaled as well as a the raw transformed data can be found in the user specified ouput folder after each run of the above described function.
+
+#### Genetic algorithm
+
+The genetic algorithm is implemented as a binary genotype in the length of the total number of vaccine elements, where a 1 indicates the presence of the vaccine element and 0 denotes the absence of a vaccine element. The phenotype (search) space of this genotype denotation would be all possible set and combinations of vaccine element sets. Based on the phenotype the overall objective function $f(x)$ can be calculated for each individual (solution) in the population.
+
+The exact steps of the genetic algorithm can be summarized as following:
+1. Initialize a random set of individual solutions, e.g., sets of varying vaccine elements
+2. Calculate $f(x)$ for each individual $x$ in the population
+3. Replace the worst (lowest $f(x)$ values) one third of the population with the best solution (highest $f(x)$)
+4. Mutate each individual based on a mutation rate (number of vaccine elements taken in or out of the solution)
+5. Cross-over the individual with the highest fitness with a random individual of the population
+6. Keep the genotype of the individual with the highest fitness in the population
+7. Repeat from step 2 until the number of simulated generations is reached
+
+#### Benchmark
