@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+
+import HLAopti
+import argparse
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("input", help="Specify input csv file with HLA data")
+parser.add_argument("immunocut", help="Specify the cut-off value of Immunogenicity")
+parser.add_argument("outdir", help="Specify an output directory for results")
+args = parser.parse_args()
+
+assert float(args.immunocut) < 0.99, "Your cut-off value for Immunogenicity is too high"
+
+velall = HLAopti.compareHLAdata(args.input, args.immunocut)
+Path(args.outdir).mkdir(parents=True, exist_ok=True) # create output directory if not exists
+velall[0].to_csv(args.outdir+'/summed_vaccine_elements.tsv', sep="\t", index=False) # write output list of ranked vaccine elements
+velscale = velall[1] # save the scored vaccine elements as separate data frame
+velscale.to_csv(args.outdir+'/scored_vaccine_elements.tsv', sep="\t", index=False) # write output list of ranked vaccine elements
+
+### perform the Genetic algorithm 10 times and select best solutions
+fitdat = [] # empty list for fitness data (will be plotted later)
+allsol = [] # empty list for minimal list of solutions
+for i in range(0,10): # perform 10 replicates
+	alldat = HLAopti.geneticAlgo(velscale, 100, 2, 100, True) # perform the genetic algorithm
+	allsol.append(alldat[0]) # fill in solutions data
+	fitdat.append(alldat[1]) # fill in fitness data
+
+HLAopti.plotFitness(fitdat, args.outdir+'/fitness_lineplots.pdf') # write output plot with fitness values
+HLAopti.rankVels(allsol, args.outdir+'/minimal_set_ranked.tsv') # write output tsv of minimal set of vaccine elements
