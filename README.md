@@ -122,7 +122,7 @@ The exact steps of the genetic algorithm can be summarized as following:
 
 The mutation rate has one of the biggest influence on solution finding in genetic algorithms. To optimize the mutation rate, the genetic algorithm has therefore been simulated with different mutation rates. In addition, to benchmark the objective function, the above described weights $w$ were randomized in each generation.
 
-![GA_fixed](image1.png) ![GA_random](GA_random.png)
+![GA_fixed](GA_fixed.png) ![GA_random](GA_random.png)
 
 Mutation rates below $m=2$ seem to yield no improvement in the value of the maximum fitness and mutation rates above $m=4$ seem to yield a sharp decline in the value of the maximum fitness. Based on the results, a mutation rate of $m=2$ has been chosen in the implementation, since this yielded the highest fitness values.
 
