@@ -22,8 +22,9 @@ velscale.to_csv(args.outdir+'/scored_vaccine_elements.tsv', sep="\t", index=Fals
 fitdat = [] # empty list for fitness data (will be plotted later)
 allsol = [] # empty list for minimal list of solutions
 for i in range(0,10): # perform 10 replicates
-	alldat = geneticAlgo(velscale, 100, 2, 100) # perform the genetic algorithm
+	alldat = HLAopti.geneticAlgo(velscale, 100, 2, 100) # perform the genetic algorithm
 	allsol.append(alldat[0]) # fill in solutions data
 	fitdat.append(alldat[1]) # fill in fitness data
 
 HLAopti.plotFitness(fitdat, args.outdir+'/fitness_lineplots.pdf') # write output plot with fitness values
+HLAopti.rankVels(allsol, args.outdir+'/minimal_set_ranked.tsv') # write output tsv of minimal set of vaccine elements

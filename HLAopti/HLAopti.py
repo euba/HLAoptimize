@@ -181,9 +181,17 @@ def plotFitness(fitdat, outplot):
 	fitdfl = fitdfl.rename(columns={'variable': 'replicate'}) # rename variable column
 	fig, ax = plt.subplots(figsize=(12, 10)) # set up plot
 	lp = sns.lineplot(data=fitdfl, x='Generations', y='value', hue='replicate', ax=ax) # plot line plot
-	lp.set_title("GA of 10 replicates", size=18) # setting the plot title
+	lp.set_title("GA of "+str(len(fitdat))+" replicates", size=18) # setting the plot title
 	lp.set_xlabel('Generations', size=15) # setting size of x-axis label
 	lp.set_ylabel('Max Fitness', size=15) # setting size of y-axis label
 	sns.move_legend(lp, "upper left", bbox_to_anchor=(1, 1)) # shifting the legend to the left
 	lp.figure.savefig(outplot) # save the plot
 
+def rankVels(allsol, outtsv):
+	flatsol = list(np.concatenate(allsol)) # unlist all solutions
+	rankvel = [] # create empty data structure to fill in
+	for i in set(flatsol): # iterate through all unique vaccine elements in solution
+		rankvel.append([i, flatsol.count(i)]) # count number of occurrence as score
+	veldf = pd.DataFrame(rankvel, columns=['Element','Score']) # convert scored vaccine elements to data frame
+	veldf = veldf.sort_values(by=['Score'], ignore_index=True, ascending=False) # sort vaccine elements by score
+	veldf.to_csv(outtsv, sep="\t", index=False) # write output list of ranked vaccine elements
