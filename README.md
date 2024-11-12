@@ -76,9 +76,9 @@ HLAoptiGA_cli 'exercise_data.csv' 0.7 'test_output'
 To find suitable vaccine elements, the HLA coverage is calculated by selected HLAs with an user defined immunogenicity cut-off for a specific user defined virus. The resulting table is then ranked by HLA coverage (number of covered HLAs per vaccine element) and median immunigenicity score of the vaccine element.
 
 The resulting table is then exported as .tsv file to an user defined output directory along with additional plots. The plot includes a bar chart with the HLA coverage per vaccine element of the seleted virus, in which top vaccine elements are highlighted in red. In addition, a scatter plot shows the median immunogenicity over the HLA coverage, in which top vaccine elements are again highlighted in red and points are scaled by the error rate:
-
-![HLA coverage 2D](score2d.png)
-
+<p align="center">
+  <img width="460" src="score2d.png">
+</p>
 It is recommended to investigate to output plots and the ranked .tsv table to make a decision on which vaccine element might be best suited for further investigation.
 
 ### Minimal sets of vaccine elements
@@ -122,7 +122,9 @@ The exact steps of the genetic algorithm can be summarized as following:
 
 The mutation rate has one of the biggest influence on solution finding in genetic algorithms. To optimize the mutation rate, the genetic algorithm has therefore been simulated with different mutation rates. In addition, to benchmark the objective function, the above described weights $w$ were randomized in each generation.
 
-![GA_fixed](GA_fixed.png) ![GA_random](GA_random.png)
+<p align="center">
+  <img height="350" src="GA_fixed.png"><img height="350" src="GA_random.png">
+</p>
 
 Mutation rates below $m=2$ seem to yield no improvement in the value of the maximum fitness and mutation rates above $m=4$ seem to yield a sharp decline in the value of the maximum fitness. Based on the results, a mutation rate of $m=2$ has been chosen in the implementation, since this yielded the highest fitness values.
 
