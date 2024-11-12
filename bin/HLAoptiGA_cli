@@ -12,4 +12,8 @@ args = parser.parse_args()
 
 assert float(args.immunocut) < 0.99, "Your cut-off value for Immunogenicity is too high"
 
-print(HLAopti.compareHLAdata(args.input, args.immunocut))
+velall = HLAopti.compareHLAdata(args.input, args.immunocut)
+Path(args.outdir).mkdir(parents=True, exist_ok=True) # create output directory if not exists
+velall[0].to_csv(args.outdir+'/summed_vaccine_elements.tsv', sep="\t", index=False) # write output list of ranked vaccine elements
+velscale = velall[1] # save the scored vaccine elements as separate data frame
+velscale.to_csv(args.outdir+'/scored_vaccine_elements.tsv', sep="\t", index=False) # write output list of ranked vaccine elements

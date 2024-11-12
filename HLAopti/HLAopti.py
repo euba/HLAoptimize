@@ -98,7 +98,7 @@ def compareHLAdata(csvfile, immunocut):
 		columns=['Immunogenicity','Binding','Error','HLA coverage']) # scale only numeric elements
 	veldata_scaled['Error'] = 1-veldata_scaled['Error'] # inverse error rate to allow maximization
 	veldata_scaled.index = veldata['Element'] # rename index by vaccine elements
-	return(veldata_scaled)
+	return([veldata, veldata_scaled])
 
 def calcFitness(velscale, velpheno, velweight):
 	fitness_mat = velscale.loc[velpheno] # select a subset of the scaled vaccine element features based on minimal set
