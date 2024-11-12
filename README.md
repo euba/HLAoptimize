@@ -81,3 +81,13 @@ The resulting table is then exported as .tsv file to an user defined output dire
 
 It is recommended to investigate to output plots and the ranked .tsv table to make a decision on which vaccine element might be best suited for further investigation.
 
+### Minimal sets of vaccine elements
+
+To find optimal sets of vaccine elements that satisfy different objective functions, a genetic algorithm is used for optimization. The following objective functions need to be satisfied:
+
+- $iscore$: Maximize the sum of immogenicity score over all HLAs in a vaccine element over all viruses
+- $binding$: Maximize the sum of Binding over all HLAs in a vaccine element over all viruses
+- $1-error$: Minimize the overall error rate by maximizing the inverse
+- $HLAcover$: Maximize the HLA coverage over all vaccine elements over all viruses
+- $|vel_all| - |vel_sel|$: Minimize the set of selected vaccine elements as a maximization of the inverse size
+
