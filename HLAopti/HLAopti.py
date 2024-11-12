@@ -1,3 +1,4 @@
+import math
 import random
 import numpy as np
 import pandas as pd
@@ -98,7 +99,7 @@ def compareHLAdata(csvfile, immunocut):
 	veldata_scaled.index = veldata['Element'] # rename index by vaccine elements
 	return(veldata_scaled)
 
-def calcFitness(velscale, velpheno, velweight=[0.5,2,2,1,2]):
+def calcFitness(velscale, velpheno, velweight):
 	fitness_mat = velscale.loc[velpheno] # select a subset of the scaled vaccine element features based on minimal set
 	fitness_all = np.array(fitness_mat.mean(axis=0)) # calculate array of individual fitness functions
 	len_fitness = 1-len(velpheno)/len(velscale.index) # calculate inverse of vaccine element list, which can be maximized (e.g., minimized)
@@ -110,6 +111,19 @@ def geno2Pheno(velindex, velgenome): # helper function to convert array of prese
 	velpheno = list(np.take(velindex, np.where(velgenome == 1)[0]))
 	return(velpheno)
 
+def calcPopFitness(population, velscale, randfitness=False):
+	if randfitness: # flag determines if weighting of objective function should be randomized
+		velweight = [random.uniform(0.1, 2.5),random.uniform(0.1, 2.5),
+				random.uniform(0.1, 2.5),random.uniform(0.1, 2.5),random.uniform(0.1, 2.5)]
+	else:
+		velweight = [0.5,2,2,1,2] # use this as default weights for objective function
+	popfit = []
+	for i in range(len(population)):
+		popfit.append(calcFitness(velscale, 
+			geno2Pheno(velscale.index, population[i]),
+			velweight))
+	return(popfit)
+
 def mutation(velgenome, mutrate): # helper function to mutate random positions in genome
 	for i in range(1,mutrate): # mutation rate is implemented as number of positions mutated
 		randind = random.randint(0, len(velgenome)-1) # select a random position
@@ -117,11 +131,36 @@ def mutation(velgenome, mutrate): # helper function to mutate random positions i
 			velgenome[randind] = 0
 		else:
 			velgenome[randind] = 1
+	if np.sum(velgenome) == 0: # in case mutation creates an empty solution set
+		velgenome[random.randint(0, len(velgenome)-1)] = 1
 	return(velgenome)
 
 def crossOver(velgenome1, velgenome2): # helper function to cross over two genomes with each other
 	randind = random.randint(0, len(velgenome1)-1) # select random position to cross over in
 	velgenome_new = np.concatenate((velgenome1[:randind], velgenome2[randind:])) # cross over both genomes
+	if np.sum(velgenome_new) == 0: # in case cross over creates an empty solution set
+		velgenome_new[random.randint(0, len(velgenome_new)-1)] = 1
 	return(velgenome_new)
+
+def initPop(positions, popsize): # helper function to initialize a set of random solutions
+	popinit = np.ones((popsize, positions)).astype(int) # create a initial matrix of integers
+	for i in range(0,popsize-1): # fill each individual in solution population with 0
+		randpos = random.sample(range(0, positions-1),
+			positions-math.ceil(positions/10)) # leave at least 10 vaccine elements in the solution
+		popinit[i][randpos] = 0
+	return(popinit)
+
+def selectPop(population, velscale, mutrate):
+	popfit = calcPopFitness(population, velscale) # calculate population wide fitness per individual solution
+	fitind = population[np.argmax(popfit)] # find solution with highest fitness
+	for i in range(math.ceil(len(population)/3)): # replace low fitness solutions (one third of population) with highest fitness
+		deadind = np.argmin(popfit) # find the lowest fitness individual
+		population[deadind] = fitind # replace low with highest fitness individual
+		popfit[deadind] = max(popfit) # replace fitness value
+	for i in range(len(population)): # go trough each individual solution and perform mutation
+		population[i] = mutation(population[i], mutrate)
+	population[np.argmax(popfit)] = crossOver(population[np.argmax(popfit)], 
+		population[random.randint(0, len(population)-1)]) # perform cross over with highest fitness and one random individual
+	return(population)
 
 
