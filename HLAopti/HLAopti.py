@@ -173,3 +173,17 @@ def geneticAlgo(velscale, popsize, mutrate, generations, randfitness=False): # m
 	best_sol = geno2Pheno(velscale.index,pop[np.argmax(calcPopFitness(pop, velscale, velweight))]) # select the best solution at the end of the simulation
 	return([best_sol, fitlist]) # export best solution and list of max fitness values
 
+def plotFitness(fitdat, outplot):
+	fitdf = pd.DataFrame(fitdat) # convert to list of lists to data frame
+	fitdf = fitdf.transpose() # transpose the data
+	fitdf['Generations'] = range(1, len(fitdf.index)+1) # set the number of generations
+	fitdfl = pd.melt(fitdf, ["Generations"]) # restructure data for plotting
+	fitdfl = fitdfl.rename(columns={'variable': 'replicate'}) # rename variable column
+	fig, ax = plt.subplots(figsize=(12, 10)) # set up plot
+	lp = sns.lineplot(data=fitdfl, x='Generations', y='value', hue='replicate', ax=ax) # plot line plot
+	lp.set_title("GA of 10 replicates", size=18) # setting the plot title
+	lp.set_xlabel('Generations', size=15) # setting size of x-axis label
+	lp.set_ylabel('Max Fitness', size=15) # setting size of y-axis label
+	sns.move_legend(lp, "upper left", bbox_to_anchor=(1, 1)) # shifting the legend to the left
+	lp.figure.savefig(outplot) # save the plot
+
