@@ -112,12 +112,7 @@ def geno2Pheno(velindex, velgenome): # helper function to convert array of prese
 	velpheno = list(np.take(velindex, np.where(velgenome == 1)[0]))
 	return(velpheno)
 
-def calcPopFitness(population, velscale, randfitness=False):
-	if randfitness: # flag determines if weighting of objective function should be randomized
-		velweight = [random.uniform(0.1, 2.5),random.uniform(0.1, 2.5),
-				random.uniform(0.1, 2.5),random.uniform(0.1, 2.5),random.uniform(0.1, 2.5)]
-	else:
-		velweight = [0.5,1,1,1,1] # use this as default weights for objective function
+def calcPopFitness(population, velscale, velweight):
 	popfit = []
 	for i in range(len(population)): # calculate fitness value per individual solution in population
 		popfit.append(calcFitness(velscale, 
@@ -151,8 +146,8 @@ def initPop(positions, popsize): # helper function to initialize a set of random
 		popinit[i][randpos] = 0
 	return(popinit)
 
-def selectPop(population, velscale, mutrate): # helper function to select high fitness individuals
-	popfit = calcPopFitness(population, velscale) # calculate population wide fitness per individual solution
+def selectPop(population, velscale, mutrate, velweight): # helper function to select high fitness individuals
+	popfit = calcPopFitness(population, velscale, velweight) # calculate population wide fitness per individual solution
 	fitind = copy.deepcopy(population[np.argmax(popfit)]) # find solution with highest fitness
 	for i in range(math.ceil(len(population)/3)): # replace low fitness solutions (one third of population) with highest fitness
 		deadind = np.argmin(popfit) # find the lowest fitness individual
@@ -165,15 +160,16 @@ def selectPop(population, velscale, mutrate): # helper function to select high f
 	population[0] = fitind # keep at least one individual with original (unmutated) solution
 	return(population)
 
-def geneticAlgo(velscale, popsize, mutrate, generations):
+def geneticAlgo(velscale, popsize, mutrate, generations, randfitness=False): # main loop of genetic algorithm
 	pop = initPop(len(velscale.index), popsize) # initialize population with random solutions
-	#print(np.mean(calcPopFitness(pop, velscale))) 
-	pop = selectPop(pop, velscale, mutrate) # perform selection process
 	fitlist = [] # create a list with max fitness value per generation
+	velweight = [0.5,1,1,1,1] # use this as default weights for objective function
 	for x in range(generations): # interate through the specified number of generations
-		pop = selectPop(pop, velscale, mutrate) # perform selection process
-		fitlist.append(np.max(calcPopFitness(pop, velscale))) # fill in the fitness list
+		if randfitness: # flag determines if weighting of objective function should be randomized
+			velweight = [random.uniform(0.1, 2),random.uniform(0.1, 2),random.uniform(0.1, 2),random.uniform(0.1, 2),random.uniform(0.1, 2)]
+		pop = selectPop(pop, velscale, mutrate, velweight) # perform selection process
+		fitlist.append(np.max(calcPopFitness(pop, velscale, velweight))) # fill in the fitness list
 		print(fitlist[x])
-	best_sol = geno2Pheno(velscale.index,pop[np.argmax(calcPopFitness(pop, velscale))]) # select the best solution at the end of the simulation
-	return([best_sol, fitlist])
+	best_sol = geno2Pheno(velscale.index,pop[np.argmax(calcPopFitness(pop, velscale, velweight))]) # select the best solution at the end of the simulation
+	return([best_sol, fitlist]) # export best solution and list of max fitness values
 
